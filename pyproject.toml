@@ -15,6 +15,9 @@ dynamic = ["version"]
 [project.entry-points."fsspec.specs"]
 faculty-datasets = "faculty_datasets_fs.FacultyDatasetsFileSystem"
 
+[tool.setuptools]
+py-modules = ["faculty_datasets_fs"]
+
 [tool.setuptools_scm]
 version_scheme = "post-release"
 
