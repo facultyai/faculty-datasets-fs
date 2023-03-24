@@ -41,8 +41,7 @@ class FacultyDatasetsFileSystem(AbstractFileSystem):
         self.object_client = ObjectClient(url, session)
 
     def ls(self, path, detail=True, **kwargs):
-        if not path.startswith("/"):
-            path = "/" + path
+        path = _normalize_path(path)
         path_as_dir = path if path.endswith("/") else path + "/"
         subdir_or_file_pattern = re.compile(
             re.escape(path_as_dir) + r"[^\/]+/?$",
@@ -51,13 +50,14 @@ class FacultyDatasetsFileSystem(AbstractFileSystem):
         objects = [
             obj
             for obj in self._ls_objects(path)
-            if obj.path == path or subdir_or_file_pattern.match(obj.path)
+            if obj.path in {path, path_as_dir}
+            or subdir_or_file_pattern.match(obj.path)
         ]
 
         if detail:
             return [_file_info_for_obj(obj) for obj in objects]
         else:
-            return [obj.path for obj in objects]
+            return [_normalize_path(obj.path) for obj in objects]
 
     def _ls_objects(self, prefix) -> Iterable[Object]:
         list_response = self.object_client.list(self.project_id, prefix)
@@ -142,11 +142,15 @@ class FacultyDatasetsFileSystem(AbstractFileSystem):
 
 def _file_info_for_obj(obj: Object) -> dict:
     return {
-        "name": obj.path,
+        "name": _normalize_path(obj.path),
         "type": "directory" if obj.path.endswith("/") else "file",
         "size": obj.size,
         "etag": obj.etag,
     }
+
+
+def _normalize_path(path: str) -> str:
+    return "/" + path.strip("/")
 
 
 class FacultyDatasetsBufferedFile(AbstractBufferedFile):
