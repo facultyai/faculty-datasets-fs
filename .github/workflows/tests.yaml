@@ -24,6 +24,11 @@ jobs:
       - name: Install Tox
         run: pip install tox
       - name: Run tests
+        env:
+          FACULTY_DOMAIN: ${{ vars.FACULTY_DOMAIN }}
+          FACULTY_PROJECT_ID: ${{ vars.FACULTY_PROJECT_ID }}
+          FACULTY_CLIENT_ID: ${{ secrets.FACULTY_CLIENT_ID }}
+          FACULTY_CLIENT_SECRET: ${{ secrets.FACULTY_CLIENT_SECRET }}
         run: tox -e py
 
   lint:
@@ -36,7 +41,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.9
+          python-version: '3.10'
       - name: Install Tox
         run: pip install tox
       - name: Run linter
