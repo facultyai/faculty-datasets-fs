@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "faculty-datasets-fs"
+requires-python = ">=3.10"
+dependencies = [
+    "fsspec",
+    "requests",
+    "faculty",
+]
+dynamic = ["version"]
+
+[project.entry-points."fsspec.specs"]
+faculty-datasets = "faculty_datasets_fs.FacultyDatasetsFileSystem"
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+
+[tool.black]
+line-length = 79
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+follow_imports = "silent"
+check_untyped_defs = true
+enable_error_code = ["ignore-without-code"]
+show_error_codes = true
+warn_unused_ignores = true
+exclude = ["__pycache__", ".git", "build/"]
