@@ -151,7 +151,7 @@ def _file_info_for_obj(obj: Object) -> dict:
 
 class FacultyDatasetsBufferedFile(AbstractBufferedFile):
     def __init__(
-        self, object_client: ObjectClient, project_id: str, *args, **kwargs
+        self, object_client: ObjectClient, project_id: UUID, *args, **kwargs
     ) -> None:
         super().__init__(*args, **kwargs)
         self.object_client = object_client
