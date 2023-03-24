@@ -4,6 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "faculty-datasets-fs"
+description = "fsspec plugin for Faculty Datasets"
+authors = [{ name = "Faculty", email = "info@faculty.ai" }]
+urls = { company = "https://faculty.ai" }
+readme = "README.rst"
 requires-python = ">=3.10"
 dependencies = [
     "faculty",
