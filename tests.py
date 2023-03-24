@@ -9,7 +9,7 @@ FOLDER_CONTENTS = {"/folder"} | {f"/folder/data{i}.txt" for i in range(5)}
 @pytest.mark.parametrize(
     "path, expected_result",
     [
-        ("/", {"/", "/folder", "/data.txt"}),
+        ("/", {"/", "/folder", "/data.txt", "/upload.txt"}),
         ("/data.txt", {"/data.txt"}),
         ("/folder", FOLDER_CONTENTS),
         ("/folder/", FOLDER_CONTENTS),
