@@ -186,7 +186,6 @@ class FacultyDatasetsBufferedFile(AbstractBufferedFile):
             self.download_url = self.object_client.presign_download(
                 self.project_id, self.path
             )
-        print(f"fetching range {start} - {end}")
         response = requests.get(
             self.download_url,
             headers={"Range": f"bytes={start}-{end}"},
