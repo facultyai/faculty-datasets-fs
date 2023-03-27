@@ -71,6 +71,10 @@ class FacultyDatasetsFileSystem(AbstractFileSystem):
             )
             yield from list_response.objects
 
+    def glob(self, path: str, **kwargs):
+        path = _normalize_path(self._strip_protocol(path))
+        return super().glob(path, **kwargs)
+
     def info(self, path, **kwargs) -> dict:
         path = _normalize_path(self._strip_protocol(path))
 
