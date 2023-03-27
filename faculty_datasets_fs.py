@@ -20,6 +20,8 @@ from urllib3.util.retry import Retry
 
 
 class FacultyDatasetsFileSystem(AbstractFileSystem):
+    protocol = "faculty-datasets"
+
     def __init__(
         self,
         *args,
@@ -41,7 +43,7 @@ class FacultyDatasetsFileSystem(AbstractFileSystem):
         self.object_client = ObjectClient(url, session)
 
     def ls(self, path, detail=True, **kwargs):
-        path = _normalize_path(path)
+        path = _normalize_path(self._strip_protocol(path))
         path_as_dir = path if path.endswith("/") else path + "/"
         subdir_or_file_pattern = re.compile(
             re.escape(path_as_dir) + r"[^\/]+/?$",
@@ -59,7 +61,7 @@ class FacultyDatasetsFileSystem(AbstractFileSystem):
         else:
             return [_normalize_path(obj.path) for obj in objects]
 
-    def _ls_objects(self, prefix) -> Iterable[Object]:
+    def _ls_objects(self, prefix: str) -> Iterable[Object]:
         list_response = self.object_client.list(self.project_id, prefix)
         yield from list_response.objects
 
@@ -70,6 +72,8 @@ class FacultyDatasetsFileSystem(AbstractFileSystem):
             yield from list_response.objects
 
     def info(self, path, **kwargs) -> dict:
+        path = _normalize_path(self._strip_protocol(path))
+
         file: dict | None
 
         if path.endswith("/"):
@@ -87,7 +91,7 @@ class FacultyDatasetsFileSystem(AbstractFileSystem):
         else:
             return file
 
-    def _info_or_none(self, path) -> dict | None:
+    def _info_or_none(self, path: str) -> dict | None:
         try:
             obj = self.object_client.get(self.project_id, path)
         except NotFound:
@@ -95,16 +99,18 @@ class FacultyDatasetsFileSystem(AbstractFileSystem):
         else:
             return _file_info_for_obj(obj)
 
-    def checksum(self, path):
+    def checksum(self, path: str) -> str:
         return self.info(path)["etag"]
 
-    def _rm(self, path):
+    def _rm(self, path: str) -> None:
+        path = _normalize_path(self._strip_protocol(path))
         try:
             self.object_client.delete(self.project_id, path)
         except PathNotFound:
             raise FileNotFoundError(path)
 
-    def rm(self, path, recursive=False, maxdepth=None):
+    def rm(self, path: str, recursive=False, maxdepth=None):
+        path = _normalize_path(self._strip_protocol(path))
         if maxdepth is not None:
             super().rm(path, recursive, maxdepth)
         else:

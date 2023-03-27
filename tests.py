@@ -7,18 +7,22 @@ FOLDER_CONTENTS = {"/folder"} | {f"/folder/data{i}.txt" for i in range(5)}
 
 
 @pytest.mark.parametrize(
+    "prefix",
+    ["", "/", "faculty-datasets://", "faculty-datasets:///"],
+)
+@pytest.mark.parametrize(
     "path, expected_result",
     [
-        ("/", {"/", "/folder", "/data.txt", "/upload.txt"}),
-        ("/data.txt", {"/data.txt"}),
-        ("/folder", FOLDER_CONTENTS),
-        ("/folder/", FOLDER_CONTENTS),
-        ("/folder/data0.txt", {"/folder/data0.txt"}),
+        ("", {"/", "/folder", "/data.txt", "/upload.txt"}),
+        ("data.txt", {"/data.txt"}),
+        ("folder", FOLDER_CONTENTS),
+        ("folder/", FOLDER_CONTENTS),
+        ("folder/data0.txt", {"/folder/data0.txt"}),
     ],
 )
-def test_list(path, expected_result):
+def test_list(prefix, path, expected_result):
     fs = fsspec.filesystem("faculty-datasets")
-    assert set(fs.ls(path, detail=False)) == expected_result
+    assert set(fs.ls(prefix + path, detail=False)) == expected_result
 
 
 def test_read():
