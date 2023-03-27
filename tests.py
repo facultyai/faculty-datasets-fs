@@ -3,26 +3,36 @@ import os
 import fsspec
 import pytest
 
-FOLDER_CONTENTS = {"/folder"} | {f"/folder/data{i}.txt" for i in range(5)}
+FOLDER_CONTENTS = {f"/folder/data{i}.txt" for i in range(5)}
+FOLDER_WITH_CONTENTS = {"/folder"} | FOLDER_CONTENTS
 
 
-@pytest.mark.parametrize(
+PARAMETRIZE_PREFIX = pytest.mark.parametrize(
     "prefix",
     ["", "/", "faculty-datasets://", "faculty-datasets:///"],
 )
+
+
 @pytest.mark.parametrize(
     "path, expected_result",
     [
         ("", {"/", "/folder", "/data.txt", "/upload.txt"}),
         ("data.txt", {"/data.txt"}),
-        ("folder", FOLDER_CONTENTS),
-        ("folder/", FOLDER_CONTENTS),
+        ("folder", FOLDER_WITH_CONTENTS),
+        ("folder/", FOLDER_WITH_CONTENTS),
         ("folder/data0.txt", {"/folder/data0.txt"}),
     ],
 )
+@PARAMETRIZE_PREFIX
 def test_list(prefix, path, expected_result):
     fs = fsspec.filesystem("faculty-datasets")
     assert set(fs.ls(prefix + path, detail=False)) == expected_result
+
+
+@PARAMETRIZE_PREFIX
+def test_glob(prefix):
+    fs = fsspec.filesystem("faculty-datasets")
+    assert set(fs.glob(prefix + "folder/da*.txt")) == FOLDER_CONTENTS
 
 
 def test_read():
